@@ -1,4 +1,7 @@
 import os
+from random import randint
+
+import eyed3
 import pygame
 
 from settings import MUSIC_PATH
@@ -22,8 +25,9 @@ class App:
         return music_list
 
     def load_music(self):
-        self.filename = self.filename.encode('utf-8')
-        track = pygame.mixer.music.load(self.filename)
+        path = MUSIC_PATH + self.filename
+        path = path.encode('utf-8')
+        track = pygame.mixer.music.load(path)
         return track
 
     def play_music(self):
@@ -84,3 +88,14 @@ class App:
             self.unpause_music()
         else:
             self.start()
+
+    # TODO, some music formats are not supported
+    def get_music_duration(self):
+        # if self.filename is None:
+        #     return 0
+        # else:
+        #     mp3 = eyed3.load(MUSIC_PATH + self.filename)
+        #     time_secs = mp3.info.time_secs
+        #     return time_secs
+        r = randint(200, 240)
+        return r
