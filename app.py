@@ -1,4 +1,5 @@
 import os
+import threading
 from random import randint
 
 import eyed3
@@ -16,7 +17,10 @@ class App:
         self.audio_status = {'play': False, 'pause': False, }
         self.music_list = self.get_music_list()
         self.music_list_length = len(self.music_list)
+        self.playback_mode = 0
+        self.song_end = 0
 
+        pygame.init()
         pygame.mixer.init()
 
     def get_music_list(self):
@@ -77,9 +81,21 @@ class App:
         self.start()
 
     def start(self):
+        auto_switch_thread = threading.Thread(target=self.auto_switch)
+        auto_switch_thread.daemon = True
+        auto_switch_thread.start()
         self.filename = self.music_list[self.music_pos]
         self.load_music()
         self.play_music()
+
+    def auto_switch(self):
+        self.song_end = pygame.USEREVENT + 1
+        pygame.mixer.music.set_endevent(self.song_end)
+        print('start while loop')
+        while True:
+            for event in pygame.event.get():
+                if event.type == self.song_end:
+                    print('end play')
 
     def play_or_unpause(self):
         play = self.audio_status.get('play')
@@ -99,3 +115,6 @@ class App:
         #     return time_secs
         r = randint(200, 240)
         return r
+
+    def switch_playback_mode(self):
+        self.playback_mode = (self.playback_mode + 1) % 3

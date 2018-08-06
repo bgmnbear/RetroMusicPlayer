@@ -1,8 +1,6 @@
-import threading
 import tkinter
-
 import app
-import test_progress_bar
+import utils
 
 a = app.App()
 
@@ -18,21 +16,28 @@ class MusicPlayer(object):
         self.next_music_button = tkinter.Button(self.root, command=a.next_music, text="后一首")
         self.volume_up_button = tkinter.Button(self.root, command=a.volume_up, text="音量+")
         self.volume_down_button = tkinter.Button(self.root, command=a.volume_down, text="音量-")
+
         self.music_duration_text = tkinter.IntVar()
         self.music_duration_label = tkinter.Label(self.root, textvariable=self.music_duration_text)
-        # self.progress_bar = tkinter.Scale(self.root, command=test_progress_bar.show_values)
-        self.frame = tkinter.Frame(self.root, width=50, height=50)
 
-    def callback(self, event):
+        self.playback_mode_text = tkinter.StringVar(value="顺序播放")
+        self.switch_playback_mode_button = tkinter.Button(self.root, textvariable=self.playback_mode_text, )
+
+        self.test_end_event_button = tkinter.Button(self.root, command=utils.test_end_event, text="快进250s(for test)")
+
+    def callback0(self, event):
         new_duration = a.get_music_duration()
         self.music_duration_text.set(new_duration)
 
-    def gui_bind(self):
-        self.pre_music_button.bind("<Button-1>", self.callback)
-        self.next_music_button.bind("<Button-1>", self.callback)
+    def callback1(self, event):
+        a.switch_playback_mode()
+        mode = ["顺序播放", "单曲循环", "随机播放"]
+        self.playback_mode_text.set(mode[a.playback_mode])
 
-    def gui_music_duration_label_bind(self):
-        pass
+    def gui_bind(self):
+        self.pre_music_button.bind("<Button-1>", self.callback0)
+        self.next_music_button.bind("<Button-1>", self.callback0)
+        self.switch_playback_mode_button.bind("<Button-1>", self.callback1)
 
     def gui_arrange(self):
         self.play_button.pack()
@@ -43,7 +48,9 @@ class MusicPlayer(object):
         self.pre_music_button.pack()
         self.next_music_button.pack()
         self.music_duration_label.pack()
-        self.frame.pack()
+        self.switch_playback_mode_button.pack()
+
+        self.test_end_event_button.pack()
 
 
 def main():
