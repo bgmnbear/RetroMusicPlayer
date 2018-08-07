@@ -18,7 +18,7 @@ class App:
         self.music_list = self.get_music_list()
         self.music_list_length = len(self.music_list)
         self.playback_mode = 0
-        self.song_end = 0
+        self.music_end = 0
 
         pygame.init()
         pygame.mixer.init()
@@ -73,29 +73,44 @@ class App:
         pygame.mixer.music.set_volume(self.volume)
 
     def pre_music(self):
-        self.music_pos = (self.music_pos - 1) % self.music_list_length
-        self.start()
+        mode = self.playback_mode
+        if mode == 0 or mode == 1:
+            self.music_pos = (self.music_pos - 1) % self.music_list_length
+            self.start()
+        elif mode == 2:
+            self.music_pos = randint(0, self.music_list_length - 1)
+            self.start()
 
     def next_music(self):
-        self.music_pos = (self.music_pos + 1) % self.music_list_length
-        self.start()
+        mode = self.playback_mode
+        if mode == 0 or mode == 1:
+            self.music_pos = (self.music_pos + 1) % self.music_list_length
+            self.start()
+        elif mode == 2:
+            self.music_pos = randint(0, self.music_list_length - 1)
+            self.start()
 
     def start(self):
-        auto_switch_thread = threading.Thread(target=self.auto_switch)
-        auto_switch_thread.daemon = True
-        auto_switch_thread.start()
+        self.start_auto_switch_thread()
         self.filename = self.music_list[self.music_pos]
         self.load_music()
         self.play_music()
 
+    def start_auto_switch_thread(self):
+        auto_switch_thread = threading.Thread(target=self.auto_switch)
+        auto_switch_thread.daemon = True
+        auto_switch_thread.start()
+
     def auto_switch(self):
-        self.song_end = pygame.USEREVENT + 1
-        pygame.mixer.music.set_endevent(self.song_end)
-        print('start while loop')
+        self.music_end = pygame.USEREVENT + 1
+        pygame.mixer.music.set_endevent(self.music_end)
         while True:
             for event in pygame.event.get():
-                if event.type == self.song_end:
-                    print('end play')
+                if event.type == self.music_end and self.audio_status.get('play'):
+                    if self.playback_mode == 1:
+                        self.play_music()
+                    else:
+                        self.next_music()
 
     def play_or_unpause(self):
         play = self.audio_status.get('play')
