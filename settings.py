@@ -1,1 +1,2 @@
-MUSIC_PATH = r'music/'
+MUSIC_PATH = r'../music/'
+LYRIC_PATH = r'../lyric/'
