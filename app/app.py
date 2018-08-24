@@ -19,6 +19,7 @@ class App:
         self.music_list_length = len(self.music_list)
         self.playback_mode = 0
         self.music_end = 0
+        self.music_on_change = False
 
         pygame.init()
         pygame.mixer.init()
@@ -111,6 +112,7 @@ class App:
                         self.play_music()
                     else:
                         self.next_music()
+                        self.music_on_change = True
 
     def play_or_unpause(self):
         play = self.audio_status.get('play')

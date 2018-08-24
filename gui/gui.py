@@ -8,15 +8,32 @@ a = App()
 l = Lyric(a)
 
 
+class MixinPlayAndLyric(object):
+    @staticmethod
+    def play_or_unpause():
+        a.play_or_unpause()
+        l.load_lyric()
+
+    @staticmethod
+    def pre_music():
+        a.pre_music()
+        l.load_lyric()
+
+    @staticmethod
+    def next_music():
+        a.next_music()
+        l.load_lyric()
+
+
 class MusicPlayer(object):
     def __init__(self):
         self.root = tkinter.Tk()
         self.root.title("RetroMusicPlayer")
-        self.play_button = tkinter.Button(self.root, command=self.play_or_unpause, text="播放")
+        self.play_button = tkinter.Button(self.root, command=MixinPlayAndLyric.play_or_unpause, text="播放")
         self.pause_button = tkinter.Button(self.root, command=a.pause_music, text="暂停")
         self.stop_button = tkinter.Button(self.root, command=a.stop_music, text="停止")
-        self.pre_music_button = tkinter.Button(self.root, command=a.pre_music, text="前一首")
-        self.next_music_button = tkinter.Button(self.root, command=a.next_music, text="后一首")
+        self.pre_music_button = tkinter.Button(self.root, command=MixinPlayAndLyric.pre_music, text="前一首")
+        self.next_music_button = tkinter.Button(self.root, command=MixinPlayAndLyric.next_music, text="后一首")
         self.volume_up_button = tkinter.Button(self.root, command=a.volume_up, text="音量+")
         self.volume_down_button = tkinter.Button(self.root, command=a.volume_down, text="音量-")
 
@@ -33,10 +50,6 @@ class MusicPlayer(object):
         self.lyric_text = tkinter.StringVar()
         self.lyric_label = tkinter.Label(self.root, textvariable=self.lyric_text)
 
-    def play_or_unpause(self):
-        a.play_or_unpause()
-        l.load_lyric()
-
     def gui_bind(self):
         self.pre_music_button.bind("<Button-1>", self.music_duration_callback)
         self.next_music_button.bind("<Button-1>", self.music_duration_callback)
@@ -52,6 +65,7 @@ class MusicPlayer(object):
         self.playback_mode_text.set(mode[a.playback_mode])
 
     def gui_update_lyric(self):
+        l.start_auto_switch_lyric_thread()
         l.start_update_lyric_thread()
         while True:
             self.lyric_text.set(l.sentence)
